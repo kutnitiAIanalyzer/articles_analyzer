@@ -30,7 +30,11 @@ This project is a modular framework for loading, processing, analyzing, and eval
 ## Example Usage
 
 ```bash
-python main.py --loader file --analyzer expert --limit 50
+python main.py --analyzer questionnary \
+  --tree-path tree_questioning/tree.json \
+  --data-dir data \
+  --treated-file treated_items.json \
+  --evaluate
 ```
 
 ---
