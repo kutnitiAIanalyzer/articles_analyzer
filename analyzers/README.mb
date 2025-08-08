@@ -1,0 +1,68 @@
+## `analyzers/` – Labeling Modules
+
+This folder contains modular components called **Analyzers**, which are responsible for labeling articles based on various strategies (rule-based, model-based, logic-tree based, etc.). All analyzers follow a shared interface defined in `AbstractAnalyzer`.
+
+Each analyzer takes an `Article` object and assigns a label to it using its own logic.
+
+---
+
+### Architecture
+
+Each analyzer implements:
+
+```python
+def analyze(self, article: Article) -> Article:
+    ...
+```
+
+And optionally:
+
+```python
+def __str__(self): ...
+```
+
+---
+
+### Available Analyzers
+
+| Analyzer               | Description                                                                                                                                                                                                  |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `AbstractAnalyzer`     | Base interface for all analyzers. Provides a shared `analyze()` method and a post-processing structure (`mark_as_treated`, `set_label`, etc.). Not meant to be used directly.                                |
+| `ExpertAnalyzer`       | Simulates a geopolitical expert evaluating the article's content and image of India. Uses a structured LLM prompt with scoring.                                                                              |
+| `NaiveAnalyzer`        | Mimics an average reader’s perception without political knowledge. Uses a simplified version of the expert prompt.                                                                                           |
+| `RelevanceAnalyzer`    | Checks whether the article is relevant to Indian affairs using binary logic and a relevance checklist.                                                                                                       |
+| `CompositeAnalyzer`    | Executes a **pipeline of analyzers**, aggregating or prioritizing outputs to produce a final decision.                                                                                                       |
+| `QuestionnaryAnalyzer` | Builds a **decision tree** where each node asks a yes/no question to a LLM. Depending on the answer, it routes to a sub-analyzer or assigns a final label. (See: [`tree_questioning/`](../tree_questioning)) |
+
+---
+
+### Usage Example (CLI)
+
+Each analyzer can be used via CLI by selecting its implementation:
+
+```bash
+python main.py --analyzer expert --limit 10 --data-dir data/
+```
+
+Or by using a tree-based analyzer:
+
+```bash
+python main.py --analyzer tree --tree-file tree_questioning/tree.json
+```
+
+Or via a composite logic:
+
+```python
+analyzer = CompositeAnalyzer([
+    ExpertAnalyzer(...),
+    NaiveAnalyzer(...)
+])
+```
+
+---
+
+### Related Components
+
+* `tree_questioning/` — Includes an example notebook and JSON files to build, run and evaluate a QuestionnaryAnalyzer-based tree.
+* `articles/` — Defines the `Article` class consumed and mutated by analyzers.
+* `Label` Enum — Centralized set of labels used across all analyzers (e.g., `RELEVANT`, `IRRELEVANT`, `TOO_SHORT`, etc.).

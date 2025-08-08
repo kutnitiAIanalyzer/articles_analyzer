@@ -1,0 +1,28 @@
+# Ignore all JSON files (dynamic output)
+**/*.json
+
+# But allow static config if needed
+!tree_questioning/tree.json
+!some-config-dir/config.json
+
+# Ignore Python cache and compiled files in all subfolders
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# Environment files and folders
+.env
+venv/
+.venv/
+
+# CSV and other generated datasets
+*.csv
+error_datasets/
+treated_items.*
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
