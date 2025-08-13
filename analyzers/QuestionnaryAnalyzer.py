@@ -37,10 +37,9 @@ class QuestionnaryAnalyzer(AbstractAnalyzer):
         prompt = self.prompt.format(article=content)
 
         try:
-            result = self.llm(prompt, max_tokens=300, stop=["</s>"])
-            raw_output = result["choices"][0]["text"].strip()
+            raw_output: str = self.llm(prompt, max_tokens=300, stop=["</s>"])
         except Exception as e:
-            article.add_metadata("error", f"LLM call failed: {str(e)}")
+            article.add_metadata("error", f"LLM call failed: {e}")
             article.set_label(Label.ERROR)
             article.mark_as_treated()
             return article

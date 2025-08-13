@@ -3,7 +3,8 @@ import os
 import json
 import logging
 
-from llama_cpp import Llama
+from llm.LLMClient import LLMClient
+from llm.LlamaCppClient import LlamaCppClient
 
 from config import DATA_DIR, TREATED_FILE, MODEL_PATH, QUESTION_TREE_PATH, LOG_LEVEL
 
@@ -61,8 +62,7 @@ def main():
                 print("Use --analyzer-help all to list all available analyzers.")
         return
 
-    # Load the LLaMA model
-    llm = Llama(
+    llm: LLMClient = LlamaCppClient(
         model_path=args.model_path,
         n_ctx=4096,
         n_threads=12,

@@ -49,11 +49,10 @@ class RelevanceAnalyzer(AbstractAnalyzer):
         )
 
         try:
-            result = self.llm(prompt, max_tokens=300, stop=["[END]"])
-            output = result["choices"][0]["text"].strip().lower()
+            output: str = self.llm(prompt, max_tokens=300, stop=["</s>"])
         except Exception as e:
-            article.add_metadata("error", f"LLM call failed: {str(e)}")
-            article.predicted_label = Label.ERROR
+            article.add_metadata("error", f"LLM call failed: {e}")
+            article.set_label(Label.ERROR)
             article.mark_as_treated()
             return article
 

@@ -3,6 +3,7 @@ from articles.Article import Article
 from utils import Label
 import re
 from .AbstractAnalyzer import AbstractAnalyzer
+from llm.LLMClient import LLMClient
 
 
 class BaseLLMAnalyzer(AbstractAnalyzer):
@@ -17,7 +18,7 @@ class BaseLLMAnalyzer(AbstractAnalyzer):
     - Store the results in the Article object
     """
 
-    def __init__(self, llm, max_chars: int = 2000):
+    def __init__(self, llm: LLMClient, max_chars: int = 2000):
         """
         Args:
             llm: The language model instance to use (e.g. llama_cpp.Llama)
@@ -38,23 +39,21 @@ class BaseLLMAnalyzer(AbstractAnalyzer):
         prompt = self.build_prompt(content)
 
         try:
-            result = self.llm(prompt, max_tokens=300, stop=["</s>"])
-            raw_output = result["choices"][0]["text"].strip()
+            raw_output: str = self.llm(prompt, max_tokens=300, stop=["</s>"])
         except Exception as e:
-            article.add_metadata("error", f"LLM call failed: {str(e)}")
+            article.add_metadata("error", f"LLM call failed: {e}")
             article.set_label(Label.ERROR)
             article.mark_as_treated()
             return article
 
         parsed = self.parse_output(raw_output)
 
-        for k, v in parsed["analysis"].items():
+        for k, v in (parsed.get("analysis") or {}).items():
             article.add_analysis(k, v)
-
-        for k, v in parsed["meta"].items():
+        for k, v in (parsed.get("meta") or {}).items():
             article.add_metadata(k, v)
 
-        article.predicted_label = parsed["label"]
+        article.predicted_label = parsed.get("label", Label.UNCERTAIN)
         article.mark_as_treated()
         return article
 
