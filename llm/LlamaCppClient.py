@@ -10,7 +10,7 @@ class LlamaCppClient(LLMClient):
 
     # LlamaCppClient.py (only __call__ changed)
     def __call__(self, prompt: str, **gen_kwargs) -> str:
-        params = {**self._defaults, **gen_kwargs}
+        params = {**gen_kwargs}
         out = self._llama(prompt, **params)
 
         # Normalize to plain string; raise if we can't.
